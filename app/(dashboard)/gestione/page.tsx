@@ -7,6 +7,7 @@ import { useDemo } from "@/lib/demo/DemoProvider";
 import * as demo from "@/lib/demo/store";
 import { cn } from "@/lib/utils";
 import type { SupplyKind } from "@/types/database";
+import { PageIntro } from "@/components/shared/PageIntro";
 
 const KIND_LABELS: Record<SupplyKind, string> = {
   farmaco: "Farmaco",
@@ -61,16 +62,14 @@ export default function GestionePage() {
 
   return (
     <div className="px-5 pb-28">
-      <header className="animate-fade-up">
-        <p className="text-sm font-medium text-muted">Gestione quotidiana</p>
-        <h1 className="font-display text-2xl font-semibold text-ink">Scorte, turni e visite</h1>
-        <p className="mt-1 text-sm text-muted">
-          Tieni sotto controllo scorte basse, chi è di turno e i prossimi appuntamenti.
-        </p>
-        <Link href="/spese" className="mt-3 inline-flex text-sm font-bold text-pine underline-offset-2 hover:underline">
-          Vai alle spese →
-        </Link>
-      </header>
+      <PageIntro
+        eyebrow="Gestione quotidiana"
+        title="Scorte, turni e visite"
+        description="Autonomia scorte in giorni, chi è in servizio, prossimi controlli e parametri vitali con soglie di attenzione."
+      />
+      <Link href="/spese" className="mt-3 inline-flex text-sm font-bold text-pine underline-offset-2 hover:underline">
+        Vai alle spese e saldi →
+      </Link>
 
       {low.length > 0 && (
         <div className="mt-5 flex gap-3 rounded-2xl border border-alert/30 bg-alert-soft/80 p-4 animate-fade-up">

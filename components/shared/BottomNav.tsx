@@ -17,7 +17,7 @@ const familyItems = [
 
 const caregiverItems = [
   { href: "/operatore", label: "Turno", icon: Home },
-  { href: "/oggi", label: "Farmaci", icon: CalendarDays },
+  { href: "/oggi", label: "Priorità", icon: CalendarDays },
   { href: "/scheda", label: "Scheda", icon: Users },
 ];
 
@@ -29,7 +29,7 @@ export function BottomNav() {
   const items = isCaregiver(session.role) ? caregiverItems : familyItems;
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-md border-t border-line/80 bg-white/90 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-md">
+    <nav className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-md border-t border-line/70 bg-white/92 px-2 pb-[max(0.55rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-12px_40px_-28px_rgba(12,42,34,0.35)] backdrop-blur-xl">
       <ul className={cn("grid gap-1", items.length === 3 ? "grid-cols-3" : "grid-cols-5")}>
         {items.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
@@ -39,11 +39,11 @@ export function BottomNav() {
                 href={href}
                 data-touch
                 className={cn(
-                  "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[11px] font-semibold transition",
-                  active ? "bg-mist text-pine" : "text-muted hover:text-ink"
+                  "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-[11px] font-semibold transition",
+                  active ? "bg-mist text-pine shadow-[inset_0_0_0_1px_rgba(22,63,52,0.08)]" : "text-muted hover:text-ink"
                 )}
               >
-                <Icon className={cn("h-5 w-5", active && "text-pine")} strokeWidth={active ? 2.4 : 2} />
+                <Icon className={cn("h-5 w-5", active && "text-pine")} strokeWidth={active ? 2.45 : 2} />
                 {label}
               </Link>
             </li>

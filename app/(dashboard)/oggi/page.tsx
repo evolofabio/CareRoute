@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { formatTodayLabel } from "@/lib/utils/dates";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
+import { PageIntro, SectionTitle } from "@/components/shared/PageIntro";
 
 export default function OggiPage() {
   const { session } = useDemo();
@@ -70,7 +71,6 @@ export default function OggiPage() {
   if (!session || !adherence || !report) return null;
 
   const critical = queue.filter((a) => a.priority === "critical");
-  const rest = queue.filter((a) => a.priority !== "critical");
 
   const copyBriefing = async () => {
     try {
@@ -87,16 +87,16 @@ export default function OggiPage() {
 
   return (
     <div className="pb-28">
-      <header className="px-5 pb-2 pt-4 animate-fade-up">
-        <p className="text-sm font-medium capitalize text-muted">Oggi · {formatTodayLabel()}</p>
-        <h1 className="font-display text-3xl font-semibold text-ink">Cosa fare ora</h1>
-        <p className="mt-1 text-sm text-muted">
-          Priorità reali per {session.patient_name} — non una lista decorativa.
-        </p>
-      </header>
+      <div className="px-5 pb-2 pt-5">
+        <PageIntro
+          eyebrow={`Oggi · ${formatTodayLabel()}`}
+          title="Cosa fare ora"
+          description={`Priorità operative per ${session.patient_name}: ritardi, vitali, scorte, aiuti e visite — ordinate per urgenza, non per menu.`}
+        />
+      </div>
 
       {/* Snapshot utile */}
-      <section className="mx-5 mt-4 grid grid-cols-3 gap-2 animate-fade-up">
+      <section className="mx-5 mt-5 grid grid-cols-3 gap-2.5 animate-fade-up" style={{ animationDelay: "60ms" }}>
         <Stat
           label="Aderenza"
           value={`${adherence.percent}%`}
@@ -129,13 +129,12 @@ export default function OggiPage() {
       )}
 
       {/* Coda azioni */}
-      <section className="mt-6 px-5 animate-fade-up">
-        <div className="mb-3 flex items-end justify-between">
-          <h2 className="font-display text-xl font-semibold text-ink">Priorità</h2>
-          <Link href="/report" className="text-sm font-bold text-pine">
-            Report →
-          </Link>
-        </div>
+      <section className="mt-7 px-5 animate-fade-up" style={{ animationDelay: "100ms" }}>
+        <SectionTitle
+          eyebrow="Coda operativa"
+          title="Priorità di oggi"
+          description="Critico = adesso. Alto = oggi. Medio = non perdere la giornata. Tocca una riga per agire."
+        />
 
         {queue.length === 0 ? (
           <div className="rounded-2xl border border-ok/25 bg-ok-soft/60 p-5 text-center">
@@ -150,24 +149,28 @@ export default function OggiPage() {
             ))}
           </ul>
         )}
+        <Link href="/report" className="mt-4 inline-flex text-sm font-bold text-pine">
+          Apri report di cura completo →
+        </Link>
       </section>
 
       {/* Briefing WhatsApp — valore reale */}
-      <section className="mx-5 mt-8 rounded-3xl border border-pine/20 bg-pine p-5 text-white animate-fade-up">
-        <div className="flex items-start justify-between gap-3">
+      <section className="relative mx-5 mt-9 overflow-hidden rounded-[1.75rem] border border-pine/20 bg-pine p-5 text-white shadow-[var(--shadow)] animate-fade-up">
+        <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-leaf/30 blur-2xl" />
+        <div className="relative flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-white/70">Briefing famiglia</p>
-            <h2 className="mt-1 font-display text-xl font-semibold">Messaggio pronto da inviare</h2>
-            <p className="mt-1 text-sm text-white/75">
-              Un solo testo con dosi, note, vitali, scorte e visite — via WhatsApp o SMS.
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/65">Briefing famiglia</p>
+            <h2 className="mt-1.5 font-display text-xl font-semibold">Messaggio pronto da inviare</h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/75">
+              Un solo testo con dosi, note, vitali, scorte e visite — via WhatsApp o SMS, senza riscrivere tutto.
             </p>
           </div>
-          <Share2 className="h-5 w-5 shrink-0 text-white/80" />
+          <Share2 className="relative h-5 w-5 shrink-0 text-white/80" />
         </div>
-        <pre className="mt-4 max-h-40 overflow-auto whitespace-pre-wrap rounded-2xl bg-black/20 p-3 text-xs leading-relaxed text-white/90">
+        <pre className="relative mt-4 max-h-40 overflow-auto whitespace-pre-wrap rounded-2xl bg-black/20 p-3 text-xs leading-relaxed text-white/90">
           {briefing}
         </pre>
-        <button data-touch className="cr-btn mt-4 w-full bg-white text-pine" onClick={copyBriefing}>
+        <button data-touch className="cr-btn relative mt-4 w-full bg-white text-pine" onClick={copyBriefing}>
           <Copy className="h-4 w-4" />
           {copied ? "Copiato!" : "Copia briefing"}
         </button>
@@ -269,15 +272,15 @@ function Stat({
   return (
     <div
       className={cn(
-        "rounded-2xl border px-3 py-3",
-        tone === "ok" && "border-ok/20 bg-ok-soft/50",
-        tone === "warn" && "border-alert/25 bg-alert-soft/60",
-        tone === "danger" && "border-sos/25 bg-sos-soft/60"
+        "rounded-[1.25rem] border px-3 py-3.5 shadow-[var(--shadow-soft)]",
+        tone === "ok" && "border-ok/20 bg-ok-soft/55",
+        tone === "warn" && "border-alert/25 bg-alert-soft/65",
+        tone === "danger" && "border-sos/25 bg-sos-soft/65"
       )}
     >
-      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{label}</p>
-      <p className="mt-1 font-display text-2xl font-semibold text-ink">{value}</p>
-      <p className="text-[11px] text-muted">{sub}</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted">{label}</p>
+      <p className="mt-1 font-display text-[1.65rem] leading-none font-semibold text-ink">{value}</p>
+      <p className="mt-1.5 text-[11px] text-muted">{sub}</p>
     </div>
   );
 }
@@ -288,10 +291,10 @@ function ActionRow({ item }: { item: ActionItem }) {
       <Link
         href={item.href}
         className={cn(
-          "flex items-start gap-3 rounded-2xl border p-4 transition active:scale-[0.99]",
+          "flex items-start gap-3 rounded-[1.35rem] border p-4 shadow-[var(--shadow-soft)] transition active:scale-[0.99]",
           item.priority === "critical" && "border-sos/30 bg-sos-soft/55",
-          item.priority === "high" && "border-alert/25 bg-alert-soft/45",
-          item.priority === "medium" && "border-line/70 bg-white/70"
+          item.priority === "high" && "border-alert/25 bg-alert-soft/50",
+          item.priority === "medium" && "border-line/60 bg-white/75"
         )}
       >
         <span

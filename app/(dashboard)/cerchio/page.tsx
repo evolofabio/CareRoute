@@ -9,6 +9,7 @@ import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { todayIsoDate } from "@/lib/utils/dates";
 import type { HelpKind } from "@/types/database";
 import { canManageMedications } from "@/lib/utils/rbac";
+import { PageIntro } from "@/components/shared/PageIntro";
 
 const HELP_LABELS: Record<HelpKind, string> = {
   pasto: "Pasto",
@@ -55,11 +56,11 @@ export default function CerchioPage() {
   return (
     <div className="px-5 pb-28">
       <header className="animate-fade-up">
-        <p className="text-sm font-medium text-muted">Cerchio di cura</p>
-        <h1 className="font-display text-2xl font-semibold text-ink">Compiti e aiuto</h1>
-        <p className="mt-1 text-sm text-muted">
-          Dividi il carico in modo visibile: nessuno resta solo a portare tutto.
-        </p>
+        <PageIntro
+          eyebrow="Cerchio di cura"
+          title="Compiti e aiuto"
+          description="Dividi il carico in modo visibile: compiti assegnati, richieste claimable ed equità tra familiari — così nessuno resta solo."
+        />
       </header>
 
       <div className="mt-5 grid grid-cols-3 gap-2 rounded-2xl border border-line/70 bg-white/50 p-1">

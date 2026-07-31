@@ -1,28 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  /* CareRoute — calm pine caregiving palette */
-  --pine: #1a4d3e;
-  --pine-deep: #0f3329;
-  --pine-mid: #2a6b56;
-  --leaf: #3d9b74;
-  --mist: #eef4f1;
-  --fog: #f6faf8;
-  --sand: #d7e4dd;
-  --ink: #14221c;
-  --muted: #5b6f65;
-  --line: #c9d8d0;
-  --alert: #b86a12;
-  --alert-soft: #f8ead6;
-  --sos: #c93b3b;
-  --sos-soft: #fde8e8;
-  --ok: #1f7a55;
-  --ok-soft: #d9f0e5;
+  /* CareRoute — editorial caregiving system */
+  --pine: #163f34;
+  --pine-deep: #0c2a22;
+  --pine-mid: #2f6b57;
+  --leaf: #3f9a72;
+  --mist: #eaf3ee;
+  --fog: #f4f8f6;
+  --sand: #d4e2da;
+  --ink: #12201a;
+  --muted: #5a6e64;
+  --line: #c5d6cd;
+  --alert: #b15f0f;
+  --alert-soft: #f7e8d4;
+  --sos: #c0393a;
+  --sos-soft: #fce7e7;
+  --ok: #1b734f;
+  --ok-soft: #d7efe4;
   --white: #ffffff;
-  --shadow: 0 18px 50px -28px rgba(15, 51, 41, 0.45);
-  --radius-lg: 1.5rem;
-  --radius-md: 1rem;
-  --touch: 3rem; /* 48px */
+  --cream-mist: #f7fbf9;
+  --shadow: 0 22px 55px -30px rgba(12, 42, 34, 0.5);
+  --shadow-soft: 0 10px 28px -18px rgba(12, 42, 34, 0.28);
+  --radius-lg: 1.65rem;
+  --radius-md: 1.1rem;
+  --touch: 3rem;
   --background: var(--fog);
   --foreground: var(--ink);
 }
@@ -73,18 +75,19 @@ h2,
 h3,
 .font-display {
   font-family: var(--font-fraunces), ui-serif, Georgia, serif;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  font-optical-sizing: auto;
 }
 
-/* Atmospheric canvas — soft layered greens, no flat white */
+/* Atmospheric canvas — morning light through pine canopy */
 .cr-atmosphere {
   position: relative;
   isolation: isolate;
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(61, 155, 116, 0.18), transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, rgba(26, 77, 62, 0.12), transparent 50%),
-    radial-gradient(700px 400px at 50% 100%, rgba(184, 106, 18, 0.06), transparent 55%),
-    linear-gradient(180deg, #f8fbf9 0%, #eef4f1 48%, #e7f0eb 100%);
+    radial-gradient(1100px 620px at 8% -8%, rgba(63, 154, 114, 0.22), transparent 58%),
+    radial-gradient(900px 520px at 100% 0%, rgba(22, 63, 52, 0.14), transparent 52%),
+    radial-gradient(720px 420px at 55% 105%, rgba(177, 95, 15, 0.07), transparent 55%),
+    linear-gradient(180deg, #f9fcfa 0%, #eef5f1 42%, #e5efe9 100%);
 }
 
 .cr-atmosphere::before {
@@ -93,9 +96,19 @@ h3,
   position: absolute;
   inset: 0;
   z-index: -1;
-  opacity: 0.35;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+  opacity: 0.28;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   mix-blend-mode: soft-light;
+}
+
+.cr-atmosphere::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(120deg, transparent 40%, rgba(255, 255, 255, 0.18) 50%, transparent 60%);
+  opacity: 0.55;
 }
 
 .cr-shell {
@@ -108,41 +121,104 @@ h3,
 .cr-shell-wide {
   margin-inline: auto;
   width: 100%;
-  max-width: 64rem;
+  max-width: 68rem;
 }
 
 .cr-panel {
-  background: color-mix(in srgb, white 82%, var(--mist));
+  background: color-mix(in srgb, white 86%, var(--mist));
+  border: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(12px);
+}
+
+.cr-panel-strong {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.92), rgba(234, 243, 238, 0.78));
   border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
 }
 
 .cr-glass {
-  background: color-mix(in srgb, white 55%, transparent);
-  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
-  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, white 58%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 50%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+.cr-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pine-mid);
+}
+
+.cr-lede {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.cr-spec {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.cr-spec-row {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.75rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.cr-spec-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cr-spec-row dt {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.cr-spec-row dd {
+  color: var(--ink);
+  margin: 0;
+}
+
+.cr-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line), transparent);
+  border: 0;
+  margin: 1.5rem 0;
 }
 
 .cr-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   min-height: var(--touch);
-  padding: 0.75rem 1.25rem;
-  border-radius: 1rem;
-  font-weight: 650;
-  font-size: 1rem;
+  padding: 0.8rem 1.35rem;
+  border-radius: 1.05rem;
+  font-weight: 680;
+  font-size: 0.98rem;
   line-height: 1.2;
-  transition: transform 160ms ease, background 160ms ease, opacity 160ms ease;
+  letter-spacing: -0.01em;
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
   border: none;
   cursor: pointer;
 }
 
 .cr-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.985);
 }
 
 .cr-btn:disabled {
@@ -151,22 +227,23 @@ h3,
 }
 
 .cr-btn-primary {
-  background: var(--pine);
+  background: linear-gradient(180deg, #1f5444 0%, var(--pine) 100%);
   color: white;
+  box-shadow: 0 10px 24px -14px rgba(12, 42, 34, 0.7);
 }
 
 .cr-btn-primary:hover {
-  background: var(--pine-deep);
+  background: linear-gradient(180deg, #234f41 0%, var(--pine-deep) 100%);
 }
 
 .cr-btn-secondary {
-  background: color-mix(in srgb, white 70%, var(--sand));
+  background: color-mix(in srgb, white 78%, var(--sand));
   color: var(--ink);
   border: 1px solid var(--line);
 }
 
 .cr-btn-sos {
-  background: var(--sos);
+  background: linear-gradient(180deg, #d24a4a 0%, var(--sos) 100%);
   color: white;
 }
 
@@ -175,9 +252,9 @@ h3,
 .cr-select {
   width: 100%;
   min-height: var(--touch);
-  border-radius: 1rem;
+  border-radius: 1.05rem;
   border: 1px solid var(--line);
-  background: color-mix(in srgb, white 88%, var(--mist));
+  background: color-mix(in srgb, white 90%, var(--mist));
   color: var(--ink);
   padding: 0.85rem 1rem;
   font: inherit;
@@ -194,7 +271,7 @@ h3,
 .cr-textarea:focus,
 .cr-select:focus {
   border-color: var(--pine-mid);
-  box-shadow: 0 0 0 3px rgba(42, 107, 86, 0.18);
+  box-shadow: 0 0 0 3px rgba(47, 107, 87, 0.18);
 }
 
 .large-targets {
@@ -210,7 +287,7 @@ h3,
 @keyframes cr-fade-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -241,8 +318,20 @@ h3,
   }
 }
 
+@keyframes cr-soft-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.03);
+  }
+}
+
 .animate-fade-up {
-  animation: cr-fade-up 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: cr-fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .animate-sheet-in {
@@ -253,10 +342,15 @@ h3,
   animation: cr-check-pop 280ms ease both;
 }
 
+.animate-soft-pulse {
+  animation: cr-soft-pulse 3.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
   .animate-sheet-in,
   .animate-check-pop,
+  .animate-soft-pulse,
   .cr-btn {
     animation: none !important;
     transition: none !important;
