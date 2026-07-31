@@ -55,20 +55,18 @@ export default function CerchioPage() {
 
   return (
     <div className="px-5 pb-28">
-      <header className="animate-fade-up">
-        <PageIntro
-          eyebrow="Cerchio di cura"
-          title="Compiti e aiuto"
-          description="Dividi il carico in modo visibile: compiti assegnati, richieste claimable ed equità tra familiari — così nessuno resta solo."
-        />
-      </header>
+      <PageIntro
+        eyebrow=""
+        title="Aiuto in famiglia"
+        description="Chiedi una mano o prendi un compito. Tutti vedono chi fa cosa."
+      />
 
       <div className="mt-5 grid grid-cols-3 gap-2 rounded-2xl border border-line/70 bg-white/50 p-1">
         {(
           [
             ["compiti", "Compiti", ListTodo],
             ["aiuto", "Aiuto", HandHelping],
-            ["equita", "Equità", Scale],
+            ["equita", "Chi aiuta", Scale],
           ] as const
         ).map(([id, label, Icon]) => (
           <button

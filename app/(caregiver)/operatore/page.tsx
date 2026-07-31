@@ -130,20 +130,19 @@ export default function OperatorePage() {
 
       <header className="mt-6 animate-fade-up">
         <p className="text-sm font-medium capitalize text-muted">{formatTodayLabel()}</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Turno guidato</h1>
-        <p className="mt-2 text-sm text-muted">
-          {doneCare}/{checklist.length} cure · {adherence.done}/{adherence.total} dosi ·{" "}
-          {openPunch ? "in servizio" : "fuori servizio"}
+        <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Turno con {session.patient_name}</h1>
+        <p className="mt-2 text-base text-muted">
+          Quattro passi semplici. Alla fine la famiglia sa tutto.
         </p>
       </header>
 
       {/* Step indicator */}
       <ol className="mt-5 grid grid-cols-4 gap-1">
         {[
-          [1, "Entra"],
+          [1, "Inizio"],
           [2, "Cure"],
-          [3, "Chiudi"],
-          [4, "Fatto"],
+          [3, "Fine"],
+          [4, "Ok"],
         ].map(([n, label]) => (
           <li
             key={n}
@@ -203,7 +202,7 @@ export default function OperatorePage() {
             <span>→</span>
           </Link>
           <button data-touch className="cr-btn cr-btn-primary w-full" onClick={startShift}>
-            {openPunch ? "Continua il turno" : "Inizia turno (timbra entrata)"}
+            {openPunch ? "Continua" : "Inizia il turno"}
           </button>
           {openPunch && (
             <button data-touch className="cr-btn cr-btn-secondary w-full" onClick={() => setStep(2)}>
@@ -314,7 +313,7 @@ export default function OperatorePage() {
           </div>
 
           <button data-touch className="cr-btn cr-btn-primary w-full" onClick={finishShift}>
-            Chiudi turno (salva tutto + esci)
+            Termina e salva
           </button>
         </section>
       )}
@@ -323,14 +322,14 @@ export default function OperatorePage() {
         <section className="mt-6 space-y-4 animate-fade-up text-center">
           <div className="rounded-3xl border border-ok/30 bg-ok-soft/70 p-6">
             <Check className="mx-auto h-10 w-10 text-ok" />
-            <h2 className="mt-3 font-display text-2xl font-semibold text-ink">Turno chiuso</h2>
+            <h2 className="mt-3 font-display text-2xl font-semibold text-ink">Turno finito</h2>
             <p className="mt-2 text-sm text-muted">
-              Vitali, benessere e consegne salvati. La famiglia può ricevere il briefing aggiornato.
+              Puoi mandare il messaggio alla famiglia.
             </p>
           </div>
           <button data-touch className="cr-btn cr-btn-primary w-full" onClick={copyBriefing}>
             <Copy className="h-4 w-4" />
-            {copied ? "Briefing copiato" : "Copia briefing per WhatsApp"}
+            {copied ? "Copiato" : "Copia messaggio per WhatsApp"}
           </button>
           <button
             data-touch

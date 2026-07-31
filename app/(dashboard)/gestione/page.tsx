@@ -63,12 +63,12 @@ export default function GestionePage() {
   return (
     <div className="px-5 pb-28">
       <PageIntro
-        eyebrow="Gestione quotidiana"
-        title="Scorte, turni e visite"
-        description="Autonomia scorte in giorni, chi è in servizio, prossimi controlli e parametri vitali con soglie di attenzione."
+        eyebrow=""
+        title="Scorte e visite"
+        description="Cosa sta finendo, chi è in turno, prossime visite e pressione."
       />
-      <Link href="/spese" className="mt-3 inline-flex text-sm font-bold text-pine underline-offset-2 hover:underline">
-        Vai alle spese e saldi →
+      <Link href="/spese" className="mt-3 inline-flex text-sm font-bold text-pine">
+        Vai alle spese →
       </Link>
 
       {low.length > 0 && (

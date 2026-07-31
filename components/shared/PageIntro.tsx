@@ -13,11 +13,16 @@ export function PageIntro({
 }) {
   return (
     <header className={cn("animate-fade-up", className)}>
-      {eyebrow && <p className="cr-eyebrow">{eyebrow}</p>}
-      <h1 className="mt-2 font-display text-[1.85rem] leading-[1.08] font-semibold text-ink md:text-[2.05rem]">
+      {eyebrow ? <p className="cr-eyebrow">{eyebrow}</p> : null}
+      <h1
+        className={cn(
+          "font-display text-[1.85rem] leading-[1.08] font-semibold text-ink md:text-[2.05rem]",
+          eyebrow ? "mt-2" : "mt-0"
+        )}
+      >
         {title}
       </h1>
-      <p className="cr-lede mt-2 max-w-[34ch]">{description}</p>
+      <p className="cr-lede mt-2 max-w-[36ch]">{description}</p>
     </header>
   );
 }
