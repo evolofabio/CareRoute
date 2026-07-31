@@ -67,6 +67,21 @@ export default function OperatorePage() {
         <EmergencyButton phone={session.emergency_phone} doctorPhone={session.doctor_phone} />
       </div>
 
+      <PunchCard
+        careGroupId={session.care_group_id}
+        userId={session.id}
+        tick={tick}
+        onChange={() => setTick((n) => n + 1)}
+      />
+
+      <Link
+        href="/scheda"
+        className="mt-4 flex items-center justify-between rounded-2xl border border-line/70 bg-white/70 px-4 py-3 text-sm font-semibold text-pine"
+      >
+        Apri scheda di {session.patient_name}
+        <span aria-hidden>→</span>
+      </Link>
+
       {latestHandoff && (
         <section className="mt-6 rounded-3xl border border-pine/15 bg-white/80 p-4 animate-fade-up">
           <div className="flex items-center gap-2 text-pine">
@@ -225,5 +240,68 @@ function ToggleRow({
       <span className="font-semibold">{label}</span>
       <span className={cn("text-sm font-bold", value ? "text-ok" : "text-muted")}>{value ? "Sì" : "No"}</span>
     </button>
+  );
+}
+
+function PunchCard({
+  careGroupId,
+  userId,
+  tick,
+  onChange,
+}: {
+  careGroupId: string;
+  userId: string;
+  tick: number;
+  onChange: () => void;
+}) {
+  const open = useMemo(() => {
+    void tick;
+    return demo.getOpenPunch(careGroupId, userId);
+  }, [careGroupId, userId, tick]);
+  const monthHours = useMemo(() => {
+    void tick;
+    return demo.getMonthAssistanceHours(careGroupId);
+  }, [careGroupId, tick]);
+
+  return (
+    <section className="mt-4 rounded-3xl border border-pine/20 bg-pine px-4 py-4 text-white animate-fade-up">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wide text-white/70">Presenza</p>
+          <p className="mt-1 font-semibold">
+            {open
+              ? `In servizio dalle ${new Date(open.punched_in_at).toLocaleTimeString("it-IT", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}`
+              : "Non ancora in servizio"}
+          </p>
+          <p className="mt-1 text-sm text-white/75">{monthHours}h di assistenza questo mese</p>
+        </div>
+        {open ? (
+          <button
+            data-touch
+            className="cr-btn min-h-12 bg-white text-pine"
+            onClick={() => {
+              demo.punchOut(careGroupId, userId);
+              onChange();
+            }}
+          >
+            Esci
+          </button>
+        ) : (
+          <button
+            data-touch
+            className="cr-btn min-h-12 bg-leaf text-white"
+            onClick={() => {
+              demo.punchIn(careGroupId, userId);
+              onChange();
+            }}
+          >
+            Entra
+          </button>
+        )}
+      </div>
+    </section>
   );
 }

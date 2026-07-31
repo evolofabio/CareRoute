@@ -8,22 +8,28 @@ import type {
   DocumentRecord,
   DocumentShare,
   Expense,
+  FamilyTask,
   GroupMember,
+  HelpKind,
+  HelpRequest,
   HandoffSummary,
   Medication,
   MedicationLog,
   MedStatus,
   PatientAlertStatus,
+  PatientCareCard,
   PatientStatusUpdate,
   SessionUser,
+  ShiftPunch,
   SupplyItem,
   UserProfile,
+  VitalReading,
   WellbeingCheckin,
 } from "@/types/database";
 import { uid } from "@/lib/utils";
 import { slotToIso, todayIsoDate } from "@/lib/utils/dates";
 
-const STORAGE_KEY = "careroute.demo.v2";
+const STORAGE_KEY = "careroute.demo.v3";
 
 function hoursFromNow(h: number) {
   const d = new Date();
@@ -381,6 +387,124 @@ function buildSeed(): DemoState {
     },
   ];
 
+  const careCard: PatientCareCard = {
+    care_group_id: group.id,
+    birth_year: 1938,
+    conditions: ["Ipertensione", "Osteoporosi lieve"],
+    allergies: ["Penicillina"],
+    blood_type: "A+",
+    diet_notes: "Poco sale. Preferisce pasti caldi. Evitare cibi troppo speziati.",
+    preferences: "Radio Rai al mattino, passeggiata breve se c'è sole, caffè deca dopo pranzo.",
+    avoid: "Non lasciare sola in bagno. Non forzare la doccia se agitata.",
+    mobility_notes: "Deambulatore in casa. Evitare scale senza accompagnamento.",
+    gp_name: "Dr.ssa Verdi",
+    pharmacy_name: "Farmacia Centrale",
+    pharmacy_phone: "+39 02 555 0101",
+    updated_at: now,
+  };
+
+  const familyTasks: FamilyTask[] = [
+    {
+      id: uid("task"),
+      care_group_id: group.id,
+      title: "Ritirare ricetta Ramipril",
+      description: "Farmacia Centrale, ricetta già dematerializzata",
+      assigned_to: luca.id,
+      assigned_name: luca.full_name,
+      due_date: today,
+      status: "open",
+      created_by: maria.id,
+      created_at: now,
+      completed_at: null,
+      completed_by: null,
+    },
+    {
+      id: uid("task"),
+      care_group_id: group.id,
+      title: "Pagare bolletta luce",
+      description: null,
+      assigned_to: maria.id,
+      assigned_name: maria.full_name,
+      due_date: today,
+      status: "done",
+      created_by: maria.id,
+      created_at: hoursFromNow(-24),
+      completed_at: hoursFromNow(-6),
+      completed_by: maria.id,
+    },
+    {
+      id: uid("task"),
+      care_group_id: group.id,
+      title: "Chiamare cardiologo per referto",
+      description: "Chiedere se serve ripetere ECG",
+      assigned_to: null,
+      assigned_name: null,
+      due_date: today,
+      status: "open",
+      created_by: maria.id,
+      created_at: now,
+      completed_at: null,
+      completed_by: null,
+    },
+  ];
+
+  const helpRequests: HelpRequest[] = [
+    {
+      id: uid("help"),
+      care_group_id: group.id,
+      title: "Passaggio al Poliambulatorio",
+      kind: "trasporto",
+      when_label: "Domani mattina 9:30",
+      notes: "Visita cardiologica — portare ECG",
+      status: "open",
+      created_by: maria.id,
+      claimed_by: null,
+      claimed_name: null,
+      created_at: now,
+    },
+    {
+      id: uid("help"),
+      care_group_id: group.id,
+      title: "Pranzo caldo da portare",
+      kind: "pasto",
+      when_label: "Domenica 12:30",
+      notes: "Preferisce minestra e secondo leggero",
+      status: "claimed",
+      created_by: maria.id,
+      claimed_by: luca.id,
+      claimed_name: luca.full_name,
+      created_at: hoursFromNow(-10),
+    },
+  ];
+
+  const vitals: VitalReading[] = [
+    {
+      id: uid("vit"),
+      care_group_id: group.id,
+      recorded_at: hoursFromNow(-3),
+      systolic: 128,
+      diastolic: 78,
+      weight_kg: 62.5,
+      temperature_c: 36.4,
+      pain_level: 1,
+      note: "Mattina, a riposo",
+      created_by: anna.id,
+      author_name: anna.full_name,
+    },
+  ];
+
+  const punches: ShiftPunch[] = [
+    {
+      id: uid("punch"),
+      care_group_id: group.id,
+      user_id: anna.id,
+      user_name: anna.full_name,
+      punched_in_at: slotToIso("08:05"),
+      punched_out_at: null,
+      note: "Turno mattina in corso",
+    },
+  ];
+
   return {
     users: [maria, luca, anna],
     group,
@@ -397,6 +521,11 @@ function buildSeed(): DemoState {
     handoffs,
     supplies,
     shifts,
+    careCard,
+    familyTasks,
+    helpRequests,
+    vitals,
+    punches,
     session: null,
   };
 }
@@ -845,4 +974,247 @@ export function addShift(input: Omit<CareShift, "id" | "user_name"> & { user_nam
   state.shifts = [row, ...state.shifts];
   writeState(state);
   return row;
+}
+
+export function getCareCard(careGroupId: string) {
+  const state = readState();
+  return state.careCard.care_group_id === careGroupId ? state.careCard : state.careCard;
+}
+
+export function updateCareCard(patch: Partial<PatientCareCard>) {
+  const state = readState();
+  state.careCard = { ...state.careCard, ...patch, updated_at: new Date().toISOString() };
+  writeState(state);
+  return state.careCard;
+}
+
+export function getFamilyTasks(careGroupId: string) {
+  return readState()
+    .familyTasks.filter((t) => t.care_group_id === careGroupId)
+    .sort((a, b) => {
+      if (a.status !== b.status) return a.status === "open" ? -1 : 1;
+      return +new Date(b.created_at) - +new Date(a.created_at);
+    });
+}
+
+export function addFamilyTask(input: {
+  careGroupId: string;
+  title: string;
+  description?: string;
+  assignedTo?: string | null;
+  dueDate?: string | null;
+  userId: string;
+}) {
+  const state = readState();
+  const assignee = input.assignedTo
+    ? state.users.find((u) => u.id === input.assignedTo)
+    : null;
+  const row: FamilyTask = {
+    id: uid("task"),
+    care_group_id: input.careGroupId,
+    title: input.title,
+    description: input.description ?? null,
+    assigned_to: input.assignedTo ?? null,
+    assigned_name: assignee?.full_name ?? null,
+    due_date: input.dueDate ?? null,
+    status: "open",
+    created_by: input.userId,
+    created_at: new Date().toISOString(),
+    completed_at: null,
+    completed_by: null,
+  };
+  state.familyTasks = [row, ...state.familyTasks];
+  writeState(state);
+  return row;
+}
+
+export function completeFamilyTask(taskId: string, userId: string) {
+  const state = readState();
+  state.familyTasks = state.familyTasks.map((t) =>
+    t.id === taskId
+      ? {
+          ...t,
+          status: "done",
+          completed_at: new Date().toISOString(),
+          completed_by: userId,
+        }
+      : t
+  );
+  writeState(state);
+}
+
+export function claimFamilyTask(taskId: string, userId: string) {
+  const state = readState();
+  const user = state.users.find((u) => u.id === userId);
+  state.familyTasks = state.familyTasks.map((t) =>
+    t.id === taskId
+      ? { ...t, assigned_to: userId, assigned_name: user?.full_name ?? null }
+      : t
+  );
+  writeState(state);
+}
+
+/** Equità contributi: compiti completati + aiuti claimati + spese anticipate. */
+export function getContributionStats(careGroupId: string) {
+  const state = readState();
+  const members = state.members.filter((m) => m.care_group_id === careGroupId);
+  return members.map((m) => {
+    const user = state.users.find((u) => u.id === m.user_id);
+    const tasksDone = state.familyTasks.filter(
+      (t) => t.care_group_id === careGroupId && t.completed_by === m.user_id && t.status === "done"
+    ).length;
+    const helpsClaimed = state.helpRequests.filter(
+      (h) => h.care_group_id === careGroupId && h.claimed_by === m.user_id
+    ).length;
+    const expenseTotal = state.expenses
+      .filter((e) => e.care_group_id === careGroupId && e.paid_by_user_id === m.user_id)
+      .reduce((s, e) => s + e.amount, 0);
+    const score = tasksDone * 2 + helpsClaimed * 3 + Math.round(expenseTotal / 20);
+    return {
+      userId: m.user_id,
+      name: user?.full_name ?? "Membro",
+      role: m.role,
+      tasksDone,
+      helpsClaimed,
+      expenseTotal,
+      score,
+    };
+  }).sort((a, b) => b.score - a.score);
+}
+
+export function getHelpRequests(careGroupId: string) {
+  return readState()
+    .helpRequests.filter((h) => h.care_group_id === careGroupId)
+    .sort((a, b) => {
+      const order = { open: 0, claimed: 1, done: 2 };
+      if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+      return +new Date(b.created_at) - +new Date(a.created_at);
+    });
+}
+
+export function addHelpRequest(input: {
+  careGroupId: string;
+  title: string;
+  kind: HelpKind;
+  whenLabel: string;
+  notes?: string;
+  userId: string;
+}) {
+  const state = readState();
+  const row: HelpRequest = {
+    id: uid("help"),
+    care_group_id: input.careGroupId,
+    title: input.title,
+    kind: input.kind,
+    when_label: input.whenLabel,
+    notes: input.notes ?? null,
+    status: "open",
+    created_by: input.userId,
+    claimed_by: null,
+    claimed_name: null,
+    created_at: new Date().toISOString(),
+  };
+  state.helpRequests = [row, ...state.helpRequests];
+  writeState(state);
+  return row;
+}
+
+export function claimHelpRequest(id: string, userId: string) {
+  const state = readState();
+  const user = state.users.find((u) => u.id === userId);
+  state.helpRequests = state.helpRequests.map((h) =>
+    h.id === id
+      ? {
+          ...h,
+          status: "claimed",
+          claimed_by: userId,
+          claimed_name: user?.full_name ?? null,
+        }
+      : h
+  );
+  writeState(state);
+}
+
+export function completeHelpRequest(id: string) {
+  const state = readState();
+  state.helpRequests = state.helpRequests.map((h) =>
+    h.id === id ? { ...h, status: "done" } : h
+  );
+  writeState(state);
+}
+
+export function getVitals(careGroupId: string) {
+  return readState()
+    .vitals.filter((v) => v.care_group_id === careGroupId)
+    .sort((a, b) => +new Date(b.recorded_at) - +new Date(a.recorded_at));
+}
+
+export function addVital(input: Omit<VitalReading, "id" | "author_name">) {
+  const state = readState();
+  const author = state.users.find((u) => u.id === input.created_by);
+  const row: VitalReading = {
+    ...input,
+    id: uid("vit"),
+    author_name: author?.full_name,
+  };
+  state.vitals = [row, ...state.vitals];
+  writeState(state);
+  return row;
+}
+
+export function getPunches(careGroupId: string) {
+  return readState()
+    .punches.filter((p) => p.care_group_id === careGroupId)
+    .sort((a, b) => +new Date(b.punched_in_at) - +new Date(a.punched_in_at));
+}
+
+export function getOpenPunch(careGroupId: string, userId: string) {
+  return (
+    getPunches(careGroupId).find((p) => p.user_id === userId && !p.punched_out_at) ?? null
+  );
+}
+
+export function punchIn(careGroupId: string, userId: string, note?: string) {
+  const state = readState();
+  const existing = state.punches.find(
+    (p) => p.care_group_id === careGroupId && p.user_id === userId && !p.punched_out_at
+  );
+  if (existing) return existing;
+  const user = state.users.find((u) => u.id === userId);
+  const row: ShiftPunch = {
+    id: uid("punch"),
+    care_group_id: careGroupId,
+    user_id: userId,
+    user_name: user?.full_name,
+    punched_in_at: new Date().toISOString(),
+    punched_out_at: null,
+    note: note ?? null,
+  };
+  state.punches = [row, ...state.punches];
+  writeState(state);
+  return row;
+}
+
+export function punchOut(careGroupId: string, userId: string) {
+  const state = readState();
+  state.punches = state.punches.map((p) =>
+    p.care_group_id === careGroupId && p.user_id === userId && !p.punched_out_at
+      ? { ...p, punched_out_at: new Date().toISOString() }
+      : p
+  );
+  writeState(state);
+}
+
+export function getMonthAssistanceHours(careGroupId: string) {
+  const punches = getPunches(careGroupId);
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  let hours = 0;
+  for (const p of punches) {
+    const start = new Date(p.punched_in_at);
+    if (start < monthStart) continue;
+    const end = p.punched_out_at ? new Date(p.punched_out_at) : now;
+    hours += (end.getTime() - start.getTime()) / 3_600_000;
+  }
+  return Math.round(hours * 10) / 10;
 }

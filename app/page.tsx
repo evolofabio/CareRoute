@@ -182,15 +182,15 @@ export default function LandingPage() {
             Tutto il percorso di cura, in un’unica app
           </h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <FeatureTile icon={<Users className="h-5 w-5" />} title="Scheda del caro" body="Allergie, preferenze, mobilità e contatti — pronti per chi arriva in sostituzione." />
+            <FeatureTile icon={<HeartHandshake className="h-5 w-5" />} title="Cerchio e equità" body="Compiti assegnati, richieste di aiuto claimable e trasparenza sul carico familiare." />
+            <FeatureTile icon={<ShieldCheck className="h-5 w-5" />} title="Vitali e timbratura" body="Pressione, peso, dolore e ore di assistenza registrate sul campo." />
             <FeatureTile icon={<Pill className="h-5 w-5" />} title="Farmaci del giorno" body="Timeline con urgenze, ritardi e spunte ottimistiche — anche offline." />
             <FeatureTile icon={<Sparkles className="h-5 w-5" />} title="Benessere e checklist" body="Umore, pasti, idratazione, igiene e mobilità oltre i soli farmaci." />
             <FeatureTile icon={<CalendarDays className="h-5 w-5" />} title="Visite e appuntamenti" body="Prossimi controlli e terapie sempre visibili per tutta la famiglia." />
             <FeatureTile icon={<Wallet className="h-5 w-5" />} title="Spese e saldi" body="Chi ha anticipato cosa, categorie chiare e settlement in un tap." />
             <FeatureTile icon={<FileHeart className="h-5 w-5" />} title="Vault documenti" body="Referti e carte al sicuro, condivisibili con QR a tempo." />
-            <FeatureTile icon={<Smartphone className="h-5 w-5" />} title="Turni e consegne" body="Handoff tra operatori: riepilogo turno e alert aperti." />
-            <FeatureTile icon={<ShieldCheck className="h-5 w-5" />} title="SOS e contatti" body="Emergenza e medico di riferimento sempre a portata di pollice." />
-            <FeatureTile icon={<Users className="h-5 w-5" />} title="Gruppo di cura" body="Ruoli admin, familiare e operatore con invito per codice." />
-            <FeatureTile icon={<Route className="h-5 w-5" />} title="Scorte e scadenze" body="Scorte farmaci/materiali e reminder di rinnovo — meno corse last-minute." />
+            <FeatureTile icon={<Smartphone className="h-5 w-5" />} title="Turni e consegne" body="Handoff tra operatori, presenza in servizio e SOS a una mano." />
           </div>
         </section>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
   AlertCircle,
   Check,
@@ -102,6 +103,21 @@ export function DailyFeedDashboard({
             </ul>
           </div>
         )}
+
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+          <Link href="/scheda" className="shrink-0 rounded-full border border-line bg-white/80 px-3 py-1.5 text-xs font-bold text-pine">
+            Scheda
+          </Link>
+          <Link href="/cerchio" className="shrink-0 rounded-full border border-line bg-white/80 px-3 py-1.5 text-xs font-bold text-pine">
+            Cerchio
+          </Link>
+          <Link href="/spese" className="shrink-0 rounded-full border border-line bg-white/80 px-3 py-1.5 text-xs font-bold text-pine">
+            Spese
+          </Link>
+          <Link href="/gestione" className="shrink-0 rounded-full border border-line bg-white/80 px-3 py-1.5 text-xs font-bold text-pine">
+            Vitali
+          </Link>
+        </div>
       </header>
 
       <main className="space-y-6 px-5 pt-5">

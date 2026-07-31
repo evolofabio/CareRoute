@@ -185,6 +185,9 @@ export interface HandoffSummary {
 }
 
 export type SupplyKind = "farmaco" | "presidio" | "igiene" | "altro";
+export type TaskStatus = "open" | "done" | "cancelled";
+export type HelpKind = "pasto" | "trasporto" | "farmacia" | "compagnia" | "spesa" | "altro";
+export type HelpStatus = "open" | "claimed" | "done";
 
 export interface SupplyItem {
   id: string;
@@ -208,6 +211,80 @@ export interface CareShift {
   starts_at: string;
   ends_at: string;
   notes: string | null;
+}
+
+/** Scheda del caro — info essenziali per chi arriva in sostituzione (Famirelay/Cerchi pattern). */
+export interface PatientCareCard {
+  care_group_id: string;
+  birth_year: number | null;
+  conditions: string[];
+  allergies: string[];
+  blood_type: string | null;
+  diet_notes: string | null;
+  preferences: string | null;
+  avoid: string | null;
+  mobility_notes: string | null;
+  gp_name: string | null;
+  pharmacy_name: string | null;
+  pharmacy_phone: string | null;
+  updated_at: string;
+}
+
+/** Compiti familiari assegnabili — equità tra fratelli (CircleCare pattern). */
+export interface FamilyTask {
+  id: string;
+  care_group_id: string;
+  title: string;
+  description: string | null;
+  assigned_to: string | null;
+  assigned_name?: string | null;
+  due_date: string | null;
+  status: TaskStatus;
+  created_by: string;
+  created_at: string;
+  completed_at: string | null;
+  completed_by: string | null;
+}
+
+/** Richieste di aiuto claimable — pasti, passaggi, farmacia (Lotsa/ianacare pattern). */
+export interface HelpRequest {
+  id: string;
+  care_group_id: string;
+  title: string;
+  kind: HelpKind;
+  when_label: string;
+  notes: string | null;
+  status: HelpStatus;
+  created_by: string;
+  claimed_by: string | null;
+  claimed_name?: string | null;
+  created_at: string;
+}
+
+/** Parametri vitali semplici — pressione, peso, temperatura, dolore. */
+export interface VitalReading {
+  id: string;
+  care_group_id: string;
+  recorded_at: string;
+  systolic: number | null;
+  diastolic: number | null;
+  weight_kg: number | null;
+  temperature_c: number | null;
+  pain_level: number | null;
+  note: string | null;
+  created_by: string;
+  author_name?: string;
+}
+
+/** Timbratura presenza operatore — ore assistenza (Seremy pattern). */
+export interface ShiftPunch {
+  id: string;
+  care_group_id: string;
+  user_id: string;
+  user_name?: string;
+  punched_in_at: string;
+  punched_out_at: string | null;
+  note: string | null;
 }
 
 export interface SessionUser {
@@ -241,5 +318,10 @@ export interface DemoState {
   handoffs: HandoffSummary[];
   supplies: SupplyItem[];
   shifts: CareShift[];
+  careCard: PatientCareCard;
+  familyTasks: FamilyTask[];
+  helpRequests: HelpRequest[];
+  vitals: VitalReading[];
+  punches: ShiftPunch[];
   session: SessionUser | null;
 }

@@ -50,7 +50,9 @@ Nessuna variabile obbligatoria per l’MVP demo. Per dati reali, copia `.env.exa
 | Landing brand-first | `/` | Perché / a chi / funzioni + CTA demo |
 | Auth / onboarding | `/login`, `/registrati`, `/invito/[code]` | Demo session locale |
 | Oggi (Daily Feed) | `/oggi` | Timeline farmaci + progress + feed |
-| Gestione | `/gestione` | Scorte, turni, visite |
+| Gestione | `/gestione` | Scorte, turni, visite, vitali |
+| Cerchio | `/cerchio` | Compiti, aiuto claimable, equità |
+| Scheda | `/scheda` | Profilo assistito (allergie, preferenze) |
 | Spese | `/spese`, `/spese/nuova` | Categorie, saldi, settlement |
 | Health Vault | `/documenti`, `/documenti/[id]/condividi` | Share + QR |
 | Share pubblico | `/condividi/[token]` | Link a scadenza |
@@ -78,8 +80,29 @@ Nessuna variabile obbligatoria per l’MVP demo. Per dati reali, copia `.env.exa
 13. **Design system pine/mist + logo** — non flat white, non purple-AI  
 14. **Scorte e soglie** — alert quando farmaci/presidi scendono sotto il minimo  
 15. **Turni di cura** — chi è presente e in quale fascia oraria  
+16. **Scheda del caro** — allergie, preferenze, mobilità (pattern Famirelay/Cerchi)  
+17. **Compiti familiari** — assegnazione e completamento (pattern CircleCare)  
+18. **Richieste di aiuto** — pasti/trasporti claimable (pattern Lotsa/ianacare)  
+19. **Equità contributi** — trasparenza sul carico tra familiari  
+20. **Parametri vitali** — PA, peso, temperatura, dolore  
+21. **Timbratura presenza** — ore assistenza operatore (pattern Seremy)  
 
-Schema SQL: `supabase/migrations/` (`0001_init`, `0002_comfort_features`, `0003_gestione`)
+Schema SQL: `supabase/migrations/` (`0001`…`0004_market_features`)
+
+## Analisi mercato → priorità prodotto
+
+Benchmark 2025–26: Caring Village, CircleCare, Famirelay, Cerchi, Seremy, Lotsa Helping Hands, Medisafe.
+
+| Bisogno di mercato | Competitor tipico | In CareRoute |
+|--------------------|-------------------|--------------|
+| Scheda persona / handoff | Famirelay, Cerchi | `/scheda` |
+| Task + equità fratelli | CircleCare | `/cerchio` |
+| Aiuto comunità claimable | Lotsa, ianacare | tab Aiuto |
+| Vitali quotidiani | Famirelay, Caring Village | `/gestione` |
+| Ore badante / presenza | Seremy | punch Entra/Esci |
+| Meds + vault + spese | CareZone legacy, Carevio | già MVP |
+
+Prossimi candidati (non ancora shippati): messaggistica in-app, refill scanner, sync calendario esterno, AI assistente cura, meal-train ricorrente.
 
 > **Nota Supabase:** sull’org EVsoftware il limite free (2 progetti attivi) è già saturo. Per collegare CareRoute: metti in pausa o elimina un progetto attivo, crea `CareRoute` in `eu-west-1`, applica le migrazioni e copia URL + anon key in `.env.local` / Vercel.
 

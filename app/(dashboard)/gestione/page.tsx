@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
-import { AlertTriangle, Minus, Package, Plus } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, Activity, Minus, Package, Plus } from "lucide-react";
 import { useDemo } from "@/lib/demo/DemoProvider";
 import * as demo from "@/lib/demo/store";
 import { cn } from "@/lib/utils";
@@ -39,6 +39,17 @@ export default function GestionePage() {
     return session ? demo.getAppointments(session.care_group_id) : [];
   }, [session, tick]);
 
+  const vitals = useMemo(() => {
+    void tick;
+    return session ? demo.getVitals(session.care_group_id) : [];
+  }, [session, tick]);
+
+  const [sys, setSys] = useState("120");
+  const [dia, setDia] = useState("80");
+  const [weight, setWeight] = useState("62");
+  const [temp, setTemp] = useState("36.5");
+  const [pain, setPain] = useState("0");
+
   const low = supplies.filter((s) => s.quantity <= s.min_quantity);
 
   if (!session) return null;
@@ -56,6 +67,9 @@ export default function GestionePage() {
         <p className="mt-1 text-sm text-muted">
           Tieni sotto controllo scorte basse, chi è di turno e i prossimi appuntamenti.
         </p>
+        <Link href="/spese" className="mt-3 inline-flex text-sm font-bold text-pine underline-offset-2 hover:underline">
+          Vai alle spese →
+        </Link>
       </header>
 
       {low.length > 0 && (
@@ -69,6 +83,58 @@ export default function GestionePage() {
           </div>
         </div>
       )}
+
+      <section className="mt-10 animate-fade-up" style={{ animationDelay: "90ms" }}>
+        <div className="mb-3 flex items-center gap-2">
+          <Activity className="h-5 w-5 text-pine" />
+          <h2 className="font-display text-xl font-semibold text-ink">Parametri vitali</h2>
+        </div>
+        {vitals[0] && (
+          <article className="mb-3 rounded-2xl border border-line/70 bg-white/65 p-4">
+            <p className="text-xs font-bold uppercase tracking-wide text-muted">Ultima rilevazione</p>
+            <p className="mt-2 text-sm font-semibold text-ink">
+              PA {vitals[0].systolic}/{vitals[0].diastolic}
+              {vitals[0].weight_kg != null ? ` · ${vitals[0].weight_kg} kg` : ""}
+              {vitals[0].temperature_c != null ? ` · ${vitals[0].temperature_c}°C` : ""}
+              {vitals[0].pain_level != null ? ` · dolore ${vitals[0].pain_level}/10` : ""}
+            </p>
+            <p className="mt-1 text-xs text-muted">
+              {new Date(vitals[0].recorded_at).toLocaleString("it-IT")}
+              {vitals[0].author_name ? ` · ${vitals[0].author_name}` : ""}
+            </p>
+          </article>
+        )}
+        <form
+          className="space-y-3 rounded-2xl border border-dashed border-line bg-white/40 p-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            demo.addVital({
+              care_group_id: session.care_group_id,
+              recorded_at: new Date().toISOString(),
+              systolic: Number(sys) || null,
+              diastolic: Number(dia) || null,
+              weight_kg: Number(weight) || null,
+              temperature_c: Number(temp) || null,
+              pain_level: Number(pain) || 0,
+              note: null,
+              created_by: session.id,
+            });
+            bump();
+          }}
+        >
+          <p className="text-sm font-semibold text-ink">Nuova rilevazione</p>
+          <div className="grid grid-cols-2 gap-2">
+            <input className="cr-input" type="number" placeholder="Sistolica" value={sys} onChange={(e) => setSys(e.target.value)} />
+            <input className="cr-input" type="number" placeholder="Diastolica" value={dia} onChange={(e) => setDia(e.target.value)} />
+            <input className="cr-input" type="number" step="0.1" placeholder="Peso kg" value={weight} onChange={(e) => setWeight(e.target.value)} />
+            <input className="cr-input" type="number" step="0.1" placeholder="Temp °C" value={temp} onChange={(e) => setTemp(e.target.value)} />
+            <input className="cr-input col-span-2" type="number" min={0} max={10} placeholder="Dolore 0-10" value={pain} onChange={(e) => setPain(e.target.value)} />
+          </div>
+          <button type="submit" className="cr-btn cr-btn-primary w-full" data-touch>
+            Salva parametri
+          </button>
+        </form>
+      </section>
 
       <section className="mt-8 animate-fade-up" style={{ animationDelay: "60ms" }}>
         <div className="mb-3 flex items-center gap-2">
