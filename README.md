@@ -49,7 +49,8 @@ Nessuna variabile obbligatoria per l’MVP demo. Per dati reali, copia `.env.exa
 |------|-------|------|
 | Landing brand-first | `/` | Perché / a chi / funzioni + CTA demo |
 | Auth / onboarding | `/login`, `/registrati`, `/invito/[code]` | Demo session locale |
-| Oggi (Daily Feed) | `/oggi` | Timeline farmaci + progress + feed |
+| Oggi (Daily Feed) | `/oggi` | **Cosa fare ora** — priorità, briefing, aderenza |
+| Report | `/report` | Quadro operativo + equità + briefing |
 | Gestione | `/gestione` | Scorte, turni, visite, vitali |
 | Cerchio | `/cerchio` | Compiti, aiuto claimable, equità |
 | Scheda | `/scheda` | Profilo assistito (allergie, preferenze) |

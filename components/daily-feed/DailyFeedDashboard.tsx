@@ -11,8 +11,8 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatTime, formatTodayLabel } from "@/lib/utils/dates";
-import type { DailyTask, MedStatus, PatientAlertStatus } from "@/types/database";
+import { formatTime } from "@/lib/utils/dates";
+import type { DailyTask, MedStatus } from "@/types/database";
 import * as demo from "@/lib/demo/store";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -28,116 +28,95 @@ export function DailyFeedDashboard({
   careGroupId,
   patientName,
   currentUserId,
+  compact = false,
+  onChanged,
 }: {
   careGroupId: string;
   patientName: string;
   currentUserId: string;
+  compact?: boolean;
+  onChanged?: () => void;
 }) {
   const [tick, setTick] = useState(0);
   const tasks = useMemo(() => {
     void tick;
     return demo.getDailyTasks(careGroupId);
   }, [careGroupId, tick]);
-  const patientStatus = useMemo(() => {
+  const card = useMemo(() => {
     void tick;
-    return demo.getLatestStatus(careGroupId);
+    return demo.getCareCard(careGroupId);
   }, [careGroupId, tick]);
   const [noteOpen, setNoteOpen] = useState(false);
+  const [skipReason, setSkipReason] = useState<{ logId: string; name: string } | null>(null);
 
   const grouped = useMemo(() => groupByTimeSlot(tasks), [tasks]);
   const progress = useMemo(() => computeProgress(tasks), [tasks]);
-  const nextUp = tasks.filter((t) => t.status !== "completed" && t.status !== "skipped").slice(0, 2);
 
-  const refresh = () => setTick((n) => n + 1);
+  const refresh = () => {
+    setTick((n) => n + 1);
+    onChanged?.();
+  };
 
   return (
-    <div className="pb-28">
-      <header className="sticky top-0 z-10 border-b border-line/70 bg-fog/85 px-5 pb-4 pt-6 backdrop-blur-md">
-        <p className="text-sm font-medium capitalize text-muted">Oggi, {formatTodayLabel()}</p>
-        <div className="mt-1 flex items-center justify-between gap-3">
-          <h1 className="font-display text-2xl font-semibold text-ink">{patientName}</h1>
-          <PatientStatusBadge status={patientStatus?.status ?? "ok"} />
-        </div>
-
-        <div className="mt-4">
-          <div className="flex items-center justify-between text-xs font-semibold text-muted">
-            <span>Attività completate</span>
-            <span>
-              {progress.done}/{progress.total}
-            </span>
+    <div className={cn(!compact && "pb-28")}>
+      {!compact && (
+        <header className="border-b border-line/70 px-5 pb-4 pt-2">
+          <p className="text-sm font-medium text-muted">Somministrazioni · {patientName}</p>
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-xs font-semibold text-muted">
+              <span>Completate</span>
+              <span>
+                {progress.done}/{progress.total}
+              </span>
+            </div>
+            <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-sand">
+              <motion.div
+                className="h-full rounded-full bg-leaf"
+                initial={false}
+                animate={{ width: `${progress.percent}%` }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </div>
           </div>
-          <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-sand">
-            <motion.div
-              className="h-full rounded-full bg-leaf"
-              initial={false}
-              animate={{ width: `${progress.percent}%` }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            />
-          </div>
-        </div>
+          {card.allergies.length > 0 && (
+            <p className="mt-3 rounded-xl bg-sos-soft/80 px-3 py-2 text-xs font-semibold text-sos">
+              Allergie: {card.allergies.join(", ")}
+            </p>
+          )}
+        </header>
+      )}
 
-        {nextUp.length > 0 && (
-          <div className="mt-4 rounded-2xl border border-alert/20 bg-alert-soft/70 px-3 py-2.5">
-            <p className="text-xs font-bold uppercase tracking-wide text-alert">Prossime dosi</p>
-            <ul className="mt-1 space-y-1">
-              {nextUp.map((t) => {
-                const u = urgencyOf(t);
-                return (
-                  <li key={t.logId} className="flex items-center justify-between text-sm font-medium text-ink">
-                    <span>
-                      {t.medicationName} · {formatTime(t.scheduledFor)}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-xs font-bold",
-                        u === "overdue" && "text-sos",
-                        u === "soon" && "text-alert",
-                        u === "later" && "text-muted"
-                      )}
-                    >
-                      {u === "overdue" ? "In ritardo" : u === "soon" ? "A breve" : "In programma"}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-
-        <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-          <Link href="/scheda" className="shrink-0 rounded-full border border-line bg-white/80 px-3 py-1.5 text-xs font-bold text-pine">
-            Scheda
-          </Link>
-          <Link href="/cerchio" className="shrink-0 rounded-full border border-line bg-white/80 px-3 py-1.5 text-xs font-bold text-pine">
-            Cerchio
-          </Link>
-          <Link href="/spese" className="shrink-0 rounded-full border border-line bg-white/80 px-3 py-1.5 text-xs font-bold text-pine">
-            Spese
-          </Link>
-          <Link href="/gestione" className="shrink-0 rounded-full border border-line bg-white/80 px-3 py-1.5 text-xs font-bold text-pine">
-            Vitali
-          </Link>
-        </div>
-      </header>
-
-      <main className="space-y-6 px-5 pt-5">
+      <main className="space-y-6 px-5 pt-4">
         {grouped.length === 0 && (
-          <div className="mt-12 flex flex-col items-center gap-3 text-center">
+          <div className="mt-8 flex flex-col items-center gap-3 text-center">
             <Clock className="h-10 w-10 text-sand" />
             <p className="text-sm text-muted">Nessuna attività programmata per oggi.</p>
           </div>
         )}
 
         {grouped.map((slot) => (
-          <section key={slot.label} className="animate-fade-up">
+          <section key={slot.label}>
             <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted">{slot.label}</h2>
             <ul className="space-y-3">
               {slot.tasks.map((task) => (
                 <TaskTimelineItem
                   key={task.logId}
                   task={task}
+                  allergies={card.allergies}
                   onToggle={(nextStatus) => {
+                    if (nextStatus === "skipped") {
+                      setSkipReason({ logId: task.logId, name: task.medicationName });
+                      return;
+                    }
                     demo.toggleTask(task.logId, nextStatus, currentUserId);
+                    if (nextStatus === "completed") {
+                      demo.reportStatus({
+                        careGroupId,
+                        status: "ok",
+                        note: `${task.medicationName} somministrata (${task.dosage}).`,
+                        userId: currentUserId,
+                      });
+                    }
                     refresh();
                   }}
                 />
@@ -147,16 +126,18 @@ export function DailyFeedDashboard({
         ))}
       </main>
 
-      <div className="fixed inset-x-0 bottom-[4.5rem] z-20 mx-auto max-w-md px-4">
-        <button
-          onClick={() => setNoteOpen(true)}
-          data-touch
-          className="cr-btn cr-btn-primary w-full shadow-[var(--shadow)]"
-        >
-          <Mic className="h-5 w-5" />
-          Aggiungi nota o segnalazione
-        </button>
-      </div>
+      {!compact && (
+        <div className="fixed inset-x-0 bottom-[4.5rem] z-20 mx-auto max-w-md px-4">
+          <button
+            onClick={() => setNoteOpen(true)}
+            data-touch
+            className="cr-btn cr-btn-primary w-full shadow-[var(--shadow)]"
+          >
+            <Mic className="h-5 w-5" />
+            Aggiungi nota o segnalazione
+          </button>
+        </div>
+      )}
 
       <AnimatePresence>
         {noteOpen && (
@@ -168,30 +149,37 @@ export function DailyFeedDashboard({
           />
         )}
       </AnimatePresence>
-    </div>
-  );
-}
 
-function PatientStatusBadge({ status }: { status: PatientAlertStatus }) {
-  const isOk = status === "ok";
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold",
-        isOk ? "bg-ok-soft text-ok" : "bg-alert-soft text-alert"
-      )}
-    >
-      {isOk ? <Check className="h-3.5 w-3.5" /> : <AlertCircle className="h-3.5 w-3.5" />}
-      {isOk ? "Tutto ok" : "Segnalazione"}
-    </span>
+      <AnimatePresence>
+        {skipReason && (
+          <SkipReasonSheet
+            medicationName={skipReason.name}
+            onClose={() => setSkipReason(null)}
+            onConfirm={(reason) => {
+              demo.toggleTask(skipReason.logId, "skipped", currentUserId);
+              demo.reportStatus({
+                careGroupId,
+                status: "segnalazione",
+                note: `${skipReason.name} non somministrata: ${reason}`,
+                userId: currentUserId,
+              });
+              setSkipReason(null);
+              refresh();
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
 function TaskTimelineItem({
   task,
+  allergies,
   onToggle,
 }: {
   task: DailyTask;
+  allergies: string[];
   onToggle: (nextStatus: MedStatus) => void;
 }) {
   const isDone = task.status === "completed";
@@ -215,9 +203,7 @@ function TaskTimelineItem({
         onClick={() => onToggle(isDone ? "missed" : "completed")}
         className={cn(
           "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 transition-all active:scale-95",
-          isDone
-            ? "animate-check-pop border-ok bg-ok text-white"
-            : "border-line bg-white text-transparent"
+          isDone ? "animate-check-pop border-ok bg-ok text-white" : "border-line bg-white text-transparent"
         )}
       >
         <Check className="h-6 w-6" strokeWidth={3} />
@@ -229,8 +215,12 @@ function TaskTimelineItem({
         </p>
         <p className="text-sm text-muted">
           {task.dosage} · ore {formatTime(task.scheduledFor)}
+          {urgency === "overdue" && !isDone && !isSkipped ? " · IN RITARDO" : ""}
         </p>
         {task.instructions && <p className="mt-0.5 truncate text-xs text-muted/80">{task.instructions}</p>}
+        {allergies.length > 0 && !isDone && (
+          <p className="mt-0.5 text-[11px] font-semibold text-sos">Verifica allergie prima di somministrare</p>
+        )}
         {isDone && task.takenByName && (
           <p className="mt-0.5 text-xs font-semibold text-ok">Somministrato da {task.takenByName}</p>
         )}
@@ -250,6 +240,57 @@ function TaskTimelineItem({
   );
 }
 
+function SkipReasonSheet({
+  medicationName,
+  onClose,
+  onConfirm,
+}: {
+  medicationName: string;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+}) {
+  const reasons = [
+    "Rifiutata dalla persona",
+    "Nausea / non sta bene",
+    "Dose non disponibile",
+    "Istruzione del medico di sospendere",
+    "Altro — da verificare con famiglia",
+  ];
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-40 flex items-end bg-ink/40"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="mx-auto w-full max-w-md rounded-t-3xl bg-white p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+        initial={{ y: 40 }}
+        animate={{ y: 0 }}
+        exit={{ y: 40 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="font-display text-xl font-semibold">Perché saltare {medicationName}?</h3>
+        <p className="mt-1 text-sm text-muted">La famiglia riceverà una segnalazione con il motivo.</p>
+        <div className="mt-4 space-y-2">
+          {reasons.map((r) => (
+            <button
+              key={r}
+              data-touch
+              className="cr-btn cr-btn-secondary w-full justify-start text-left"
+              onClick={() => onConfirm(r)}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function QuickNoteSheet({
   careGroupId,
   currentUserId,
@@ -263,21 +304,6 @@ function QuickNoteSheet({
 }) {
   const [note, setNote] = useState("");
   const [flagAlert, setFlagAlert] = useState(false);
-  const [pending, setPending] = useState(false);
-
-  const handleSubmit = () => {
-    if (!note.trim()) return;
-    setPending(true);
-    demo.reportStatus({
-      careGroupId,
-      status: flagAlert ? "segnalazione" : "ok",
-      note: note.trim(),
-      userId: currentUserId,
-    });
-    setPending(false);
-    onSaved();
-    onClose();
-  };
 
   return (
     <motion.div
@@ -288,48 +314,53 @@ function QuickNoteSheet({
       onClick={onClose}
     >
       <motion.div
-        className="w-full max-w-md rounded-t-3xl bg-white p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl mx-auto"
+        className="mx-auto w-full max-w-md rounded-t-3xl bg-white p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
         initial={{ y: 40 }}
         animate={{ y: 0 }}
         exit={{ y: 40 }}
-        transition={{ type: "spring", stiffness: 380, damping: 32 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-sand" />
         <h3 className="font-display text-xl font-semibold text-ink">Nuova nota</h3>
-        <p className="mb-4 text-sm text-muted">
-          Scrivi cosa è successo oggi. La famiglia la vedrà subito nel feed.
-        </p>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Es. Ha mangiato bene a pranzo, umore tranquillo..."
+          placeholder="Cosa è successo — concreto e utile a chi arriva dopo"
           rows={4}
-          className="cr-textarea"
+          className="cr-textarea mt-3"
         />
         <button
           onClick={() => setFlagAlert((v) => !v)}
           data-touch
           className={cn(
-            "mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl border-2 text-sm font-bold transition",
+            "mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl border-2 text-sm font-bold",
             flagAlert ? "border-alert bg-alert-soft text-alert" : "border-line text-muted"
           )}
         >
           <AlertCircle className="h-4 w-4" />
-          {flagAlert ? "Attenzione richiesta" : "Segnala attenzione richiesta"}
+          {flagAlert ? "Attenzione richiesta" : "Segnala attenzione"}
         </button>
         <div className="mt-5 flex gap-3">
           <button onClick={onClose} data-touch className="cr-btn cr-btn-secondary flex-1">
             Annulla
           </button>
           <button
-            onClick={handleSubmit}
-            disabled={!note.trim() || pending}
+            onClick={() => {
+              if (!note.trim()) return;
+              demo.reportStatus({
+                careGroupId,
+                status: flagAlert ? "segnalazione" : "ok",
+                note: note.trim(),
+                userId: currentUserId,
+              });
+              onSaved();
+              onClose();
+            }}
+            disabled={!note.trim()}
             data-touch
             className="cr-btn cr-btn-primary flex-1"
           >
             <PlusCircle className="h-5 w-5" />
-            {pending ? "Invio..." : "Invia"}
+            Invia
           </button>
         </div>
       </motion.div>

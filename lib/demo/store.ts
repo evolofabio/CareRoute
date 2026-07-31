@@ -29,7 +29,7 @@ import type {
 import { uid } from "@/lib/utils";
 import { slotToIso, todayIsoDate } from "@/lib/utils/dates";
 
-const STORAGE_KEY = "careroute.demo.v3";
+const STORAGE_KEY = "careroute.demo.v4";
 
 function hoursFromNow(h: number) {
   const d = new Date();
@@ -331,11 +331,11 @@ function buildSeed(): DemoState {
       care_group_id: group.id,
       name: "Ramipril 5mg",
       kind: "farmaco",
-      quantity: 12,
+      quantity: 4,
       unit: "compresse",
       min_quantity: 10,
       expires_on: null,
-      notes: "Rinnovare ricetta questa settimana",
+      notes: "URGENTE: rinnovare ricetta — autonomia stimata pochi giorni",
       updated_at: now,
     },
     {
@@ -343,7 +343,7 @@ function buildSeed(): DemoState {
       care_group_id: group.id,
       name: "Pannoloni notte",
       kind: "presidio",
-      quantity: 8,
+      quantity: 6,
       unit: "pz",
       min_quantity: 15,
       expires_on: null,
@@ -482,12 +482,12 @@ function buildSeed(): DemoState {
       id: uid("vit"),
       care_group_id: group.id,
       recorded_at: hoursFromNow(-3),
-      systolic: 128,
-      diastolic: 78,
+      systolic: 148,
+      diastolic: 92,
       weight_kg: 62.5,
       temperature_c: 36.4,
-      pain_level: 1,
-      note: "Mattina, a riposo",
+      pain_level: 2,
+      note: "Mattina, a riposo — sopra target abituale",
       created_by: anna.id,
       author_name: anna.full_name,
     },
